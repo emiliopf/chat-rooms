@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rooms-config
+data:
+  DATABASE_HOST: 'mysql'
+  DATABASE_PORT: '3306'
+  #DATABASE_USERNAME: 'minikube'
+  #DATABASE_PASSWORD: 'minikube'
+  DATABASE_SCHEMA: 'coches'
