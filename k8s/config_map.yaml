@@ -8,3 +8,7 @@ data:
   #DATABASE_USERNAME: 'minikube'
   #DATABASE_PASSWORD: 'minikube'
   DATABASE_SCHEMA: 'coches'
+  RABBITMQ_HOST: 'rabbitmq'
+  RABBITMQ_PORT: '5672'
+  RABBITMQ_QUEUE: 'foo'
+  RABBITMQ_VHOST: '/'
