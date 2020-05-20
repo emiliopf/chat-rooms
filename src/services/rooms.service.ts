@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Rooms } from '../entities/rooms.entity';
 import { Repository } from 'typeorm';
-import { ClientProxy } from '@nestjs/microservices';
+import { CustomRabbitMQ } from '../custom-rabbitmq-client';
 
 @Injectable()
 export class RoomsService {
@@ -11,13 +11,13 @@ export class RoomsService {
     @InjectRepository(Rooms)
     private roomsRepository: Repository<Rooms>,
     @Inject('RABBITMQ')
-    private rabbitmq: ClientProxy,
+    private rabbitmq: CustomRabbitMQ,
   ) {}
 
   create(data: any) {
     const room = new Rooms();
     room.password = data.password;
-    this.rabbitmq.emit('foo',data)
+    this.rabbitmq.emit('fooooo',data)
       .subscribe({
         complete: () => {
           console.log('finish emit');

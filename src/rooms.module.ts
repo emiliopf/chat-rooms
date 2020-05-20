@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { Rooms } from './entities/rooms.entity';
 import { RoomsService } from './services/rooms.service';
 import { RoomsController } from './controllers/rooms.controller';
+import { CustomRabbitMQ } from './custom-rabbitmq-client';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { RoomsController } from './controllers/rooms.controller';
       inject: [ConfigService],
       provide: 'RABBITMQ',
       useFactory: (configService: ConfigService) => {
-        return ClientProxyFactory.create(configService.get('rabbitmq'));
+        const { options } = configService.get('rabbitmq');
+        return new CustomRabbitMQ(options)
       },
     },
   ],

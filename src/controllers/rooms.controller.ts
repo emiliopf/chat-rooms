@@ -12,6 +12,12 @@ export class RoomsController {
     return this.roomsService.create(body);
   };
 
+  @Post('/example')
+  example() {
+    console.log('example controler');
+    return this.roomsService.example();
+  };
+
   @Get('/all')
   findAll(): Promise<Rooms[]> {
     return this.roomsService.findAll();
