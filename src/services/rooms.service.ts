@@ -17,19 +17,20 @@ export class RoomsService {
   create(data: any) {
     const room = new Rooms();
     room.password = data.password;
-    this.rabbitmq.emit('fooooo',data)
-      .subscribe({
-        complete: () => {
-          console.log('finish emit');
-        },
-        next: (res) => {
-          console.log(res);
-        },
-        error: (err) => {
-          console.error('kapachao!');
-          console.log(err);
-        }
-      });
+    room.userId = data.userId;
+    // this.rabbitmq.emit('fooooo',data)
+    //   .subscribe({
+    //     complete: () => {
+    //       console.log('finish emit');
+    //     },
+    //     next: (res) => {
+    //       console.log(res);
+    //     },
+    //     error: (err) => {
+    //       console.error('kapachao!');
+    //       console.log(err);
+    //     }
+    //   });
     return this.roomsRepository.save(room);
   }
 

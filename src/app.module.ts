@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import databaseConfig from './config/database';
 import rabbitmmqConfig from './config/rabbitmq';
 import appConfig from './config/app';
+import jwtConfig from './config/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoomsModule } from './rooms.module';
 
@@ -15,6 +16,7 @@ import { RoomsModule } from './rooms.module';
         databaseConfig,
         rabbitmmqConfig,
         appConfig,
+        jwtConfig,
       ],
       isGlobal: true,
     }),

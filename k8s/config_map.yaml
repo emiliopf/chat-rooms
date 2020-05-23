@@ -8,6 +8,7 @@ data:
   #DATABASE_USERNAME: 'minikube'
   #DATABASE_PASSWORD: 'minikube'
   DATABASE_SCHEMA: 'coches'
+  CORS_ORIGIN: 'http://localhost:4200'
   RABBITMQ_HOST: 'rabbitmq'
   RABBITMQ_PORT: '5672'
   RABBITMQ_QUEUE: 'foo'

@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, Generated, BeforeInsert } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Generated, BeforeInsert, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Users } from './users.entity';
 
 
 @Entity()
@@ -9,16 +10,21 @@ export class Rooms {
 
 
   @Column({
-    'nullable': true,
+    'nullable': false,
   })
   password: string;
+
+  @Column()
+  userId: number;
+
+  @ManyToOne(type => Users)
+  @JoinColumn()
+  user: Users;
 
   @BeforeInsert()
   async hashPassword() {
     try {
-      console.log(this.password);
       this.password = await bcrypt.hash(this.password, 10);
-      //this.password = 'nessd';
     } catch (error) {
       console.log(error);
     }
