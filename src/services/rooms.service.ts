@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Rooms } from '../entities/rooms.entity';
 import { Repository } from 'typeorm';
 import { CustomRabbitMQ } from '../custom-rabbitmq-client';
+import * as bcrypt from 'bcrypt';
+
 
 @Injectable()
 export class RoomsService {
@@ -32,6 +34,13 @@ export class RoomsService {
     //     }
     //   });
     return this.roomsRepository.save(room);
+  }
+
+  async checkPassword(idRoom: string, entryPassword: string): Promise<boolean> {
+    const { password: encryptedPassword } = await this.roomsRepository.findOne(idRoom, {select: ['password']});
+    const isCorrect = await bcrypt.compare(entryPassword, encryptedPassword);
+
+    return isCorrect;
   }
 
   findAll(): Promise<Rooms[]> {
