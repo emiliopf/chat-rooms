@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Request, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, UnauthorizedException, Param, NotFoundException } from '@nestjs/common';
 import { RoomsService } from '../services/rooms.service';
 import { Rooms } from '../entities/rooms.entity';
 import { CreateRoomDto } from '../dtos/create-room.dto';
@@ -22,12 +22,25 @@ export class RoomsController {
   @Post('/login')
   @UseGuards(IsUserGuard)
   async login(@Body() body: LoginRoomDto) {
-    const isCorrect = await this.roomsService.checkPassword(body.idRoom, body.password);
+    const { idRoom, password } = body;
+    const isCorrect = await this.roomsService.checkPassword(idRoom, password);
 
     if(isCorrect) {
-      return true;
+      return { idRoom };
     } else {
       throw new UnauthorizedException();
+    }
+  }
+
+  @Get('info/:idRoom')
+  @UseGuards(IsUserGuard)
+  async info(@Param('idRoom') idRoom: string) {
+    const room = await this.roomsService.info(idRoom);
+
+    if(room) {
+      return room;
+    } else {
+      throw new NotFoundException();
     }
   }
 
