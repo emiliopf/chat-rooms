@@ -4,29 +4,43 @@ import { Rooms } from '../entities/rooms.entity';
 import { CreateRoomDto } from '../dtos/create-room.dto';
 import { IsUserGuard } from '../guards/users.guard';
 import { LoginRoomDto } from '../dtos/login-room.dto';
+import { UsersConnector } from '../utils/users-connector';
 
 @Controller('rooms')
 export class RoomsController {
 
-  constructor(private readonly roomsService: RoomsService) {}
+  constructor(
+    private readonly roomsService: RoomsService,
+    private readonly usersConnector: UsersConnector
+  ) {}
 
   @Post('/create')
-  @UseGuards(IsUserGuard)
-  async create(@Body() body: CreateRoomDto, @Request() request) {
-    const { user: userId } = request;
+  async create(@Body() body: CreateRoomDto) {
+    const rol = 'owner';
     
-    const { id } = await this.roomsService.create(Object.assign({userId}, body));
-    return { id };
+    // TODO (typescrypt 3.8) - Promise.allSetteld() 
+    const { id: idRoom } = await this.roomsService.create(body);
+    const { data: { id: idUser } } = await this.usersConnector.create(body);
+
+    const { data: { token } } = await this.usersConnector.getToken({idRoom, idUser, rol});
+    
+    return { token };
   };
 
   @Post('/login')
-  @UseGuards(IsUserGuard)
   async login(@Body() body: LoginRoomDto) {
+    const rol = 'guest';
+
     const { idRoom, password } = body;
+
+    // TODO (typescrypt 3.8) - Promise.allSetteld() 
+    const { data: { id: idUser } } = await this.usersConnector.create(body);
     const isCorrect = await this.roomsService.checkPassword(idRoom, password);
 
     if(isCorrect) {
-      return { idRoom };
+      const { data: { token } } = await this.usersConnector.getToken({idRoom, idUser, rol});
+    
+      return { token };
     } else {
       throw new UnauthorizedException();
     }

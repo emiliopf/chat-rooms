@@ -19,7 +19,6 @@ export class RoomsService {
   create(data: any) {
     const room = new Rooms();
     room.password = data.password;
-    room.userId = data.userId;
     // this.rabbitmq.emit('fooooo',data)
     //   .subscribe({
     //     complete: () => {

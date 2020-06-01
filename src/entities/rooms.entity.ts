@@ -1,7 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, Generated, BeforeInsert, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Users } from './users.entity';
-
 
 @Entity()
 export class Rooms {
@@ -13,13 +11,6 @@ export class Rooms {
     'nullable': false,
   })
   password: string;
-
-  @Column()
-  userId: number;
-
-  @ManyToOne(type => Users)
-  @JoinColumn()
-  user: Users;
 
   @BeforeInsert()
   async hashPassword() {

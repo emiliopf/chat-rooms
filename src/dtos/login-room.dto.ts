@@ -1,5 +1,5 @@
 
-import { IsNotEmpty, IsAlphanumeric } from 'class-validator';
+import { IsNotEmpty, IsAlphanumeric, MaxLength } from 'class-validator';
 
 export class LoginRoomDto {
 
@@ -10,4 +10,9 @@ export class LoginRoomDto {
   @IsNotEmpty()
   @IsAlphanumeric()
   password: string;
+
+  @IsNotEmpty()
+  @MaxLength(25)
+  @IsAlphanumeric()
+  alias: string;
 }
