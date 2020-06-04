@@ -7,4 +7,5 @@ export default registerAs('app', () => ({
   MICRO_USERS_PORT: process.env.MICRO_USERS_PORT,
   MICRO_USERS_GET_TOKEN_PATH: process.env.MICRO_USERS_GET_TOKEN_PATH,
   MICRO_USERS_CREATE_PATH: process.env.MICRO_USERS_CREATE_PATH,
+  MICRO_USERS_FIND_BY_ID: process.env.MICRO_USERS_FIND_BY_ID,
 }));

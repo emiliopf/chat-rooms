@@ -18,3 +18,4 @@ data:
   MICRO_USERS_PORT: '3000'
   MICRO_USERS_GET_TOKEN_PATH: 'users/token'
   MICRO_USERS_CREATE_PATH: 'users/create'
+  MICRO_USERS_FIND_BY_ID: 'users/'

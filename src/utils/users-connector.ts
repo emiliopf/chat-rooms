@@ -23,6 +23,13 @@ export class UsersConnector {
     return this.http.post(url, data).toPromise();
   }
 
+  findById(idUser: number) {
+    const path = this.config.get('MICRO_USERS_FIND_BY_ID');
+    const url = this.url(path);
+
+    return this.http.get(`${url}${idUser}`).toPromise();
+  }
+
   private url(path: string): string {
     const protocol = this.config.get('MICRO_USERS_PROTOCOL');
     const host = this.config.get('MICRO_USERS_HOST');

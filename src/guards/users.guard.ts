@@ -19,11 +19,14 @@ export class IsUserGuard implements CanActivate {
     const token = authorization.replace('Bearer ', '');
 
     try {
-      const { idUser } = this.jwtService.verify(token);
+      const { idUser, idRoom, rol } = this.jwtService.verify(token);
 
       if (!idUser) throw new UnauthorizedException();
       // wip: there should be other way to pass the userId to the controller without change Request
-      request.user = idUser; 
+      request.user = idUser;
+      request.room = idRoom;
+      request.rol = rol;
+
       return true;
     } catch (err) {
       return false;

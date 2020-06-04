@@ -1,14 +1,25 @@
-import { ClientProxy, ReadPacket, PacketId, WritePacket, ClientRMQ } from '@nestjs/microservices';
+import { ReadPacket, ClientRMQ } from '@nestjs/microservices';
 
 
 export class CustomRabbitMQ extends ClientRMQ {
 
   protected dispatchEvent(packet: ReadPacket): Promise<any> {
-    return new Promise(() => {
-      console.log('custom dispatch');
+    return new Promise(async (resolve, reject) => {
+      const { pattern, data } = packet;
       const exchange = 'amq.topic';
+
       this.channel.assertExchange(exchange, 'topic');
-      this.channel.publish(exchange, 'explorer', Buffer.from('foo'));
+      const published = await this.channel.publish(exchange, pattern, Buffer.from(JSON.stringify(data)));
+      
+      if (published) {
+        resolve(published);
+      } else {
+        reject(new Error('CUSTOM_RABBITMQ_CLIENT: Message not published'));
+      }
     });
+  }
+
+  generateTopic(idRoom: number, topic: string) {
+    return `ROOM-${idRoom}.${topic}`;
   }
 }
