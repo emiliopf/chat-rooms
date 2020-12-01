@@ -7,6 +7,7 @@ import { RoomsController } from './controllers/rooms.controller';
 import { CustomRabbitMQ } from './custom-rabbitmq-client';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersConnector } from './utils/users-connector';
+import { RabbitMQService } from './services/rabbitmq.service';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UsersConnector } from './utils/users-connector';
   providers: [
     RoomsService,
     UsersConnector,
+    RabbitMQService,
     {
       inject: [ConfigService],
       provide: 'RABBITMQ',

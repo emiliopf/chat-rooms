@@ -36,25 +36,4 @@ export class RoomsService {
     return this.roomsRepository.find();
   }
 
-  sendJoin(idUser: number, idRoom: number, data: any) { 
-    const topic = this.rabbitmq.generateTopic(idRoom, 'INFO');
-
-    return this.rabbitmq.emit(topic, data);
-  }
-
-
-  sendInfo(idUser: number, idRoom: number, data: any) { 
-    const topic = this.rabbitmq.generateTopic(idRoom, 'INFO');
-
-    return this.rabbitmq.emit(topic, data);
-  }
-
-  logout(idUser: number, idRoom: number, data: any) {
-    const topic = this.rabbitmq.generateTopic(idRoom, 'INFO');
-
-    return this.rabbitmq.emit(topic, data);
-  }
-
-
-
 }
