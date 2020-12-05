@@ -7,7 +7,7 @@ import { LoginRoomDto } from '../dtos/login-room.dto';
 import { UsersConnector } from '../utils/users-connector';
 import { RabbitMQService } from '../services/rabbitmq.service';
 import { CustomRabbitMQMessage } from '../dtos/custom-rabbitmq-message.dto';
-import database from 'src/config/database';
+import { CustomRabbitMQPattern } from 'src/dtos/custom-rabbitmq-pattern.dto';
 
 @Controller('')
 export class RoomsController {
@@ -22,8 +22,6 @@ export class RoomsController {
   async create(@Body() body: CreateRoomDto) {
     const rol = 'owner';
 
-    console.log('roomController - create');
-    
     // TODO (typescrypt 3.8) - Promise.allSetteld() 
     const { id: idRoom } = await this.roomsService.create(body);
     const { data: { id: idUser, alias } } = await this.usersConnector.create(body);
@@ -72,7 +70,12 @@ export class RoomsController {
       }
     }
 
-    return this.rabbitMQService.sendJoin(idRoom, message);
+    const pattern: CustomRabbitMQPattern = {
+      exchange: `ROOM-${idRoom}`,
+      topic: 'MESSAGES'
+    }
+
+    return this.rabbitMQService.sendJoin(pattern, message);
   }
 
   @Post('/message')
@@ -88,62 +91,12 @@ export class RoomsController {
       content
     }
 
-    console.log(message);
+    const pattern: CustomRabbitMQPattern = {
+      exchange: `ROOM-${idRoom}`,
+      topic: 'MESSAGES'
+    }
 
-    return this.rabbitMQService.sendMessage(idRoom, message);
+    return this.rabbitMQService.sendMessage(pattern, message);
     
   }
-
-
-  // @Post('/sendInfo')
-  // @UseGuards(IsUserGuard)
-  // async sendRoomInfo(@Body() body, @Request() request) {
-  //   const { user: idUser, room: idRoom, rol } = request;
-
-  //   if (rol !== 'owner') return new UnauthorizedException();
-
-  //   const data = {
-  //     type: 'ROOM_INFO',
-  //     event: 'REFRESH',
-  //     sender: idUser,
-  //     content: body
-  //   }
-  //   return this.rabbitMQService.sendInfo(idUser, idRoom, data);
-  // }
-
-
-  // @Post('/logout')
-  // @UseGuards(IsUserGuard)
-  // async logout(@Body() body, @Request() request) {
-  //   const { user: idUser, room: idRoom, rol } = request;
-
-  //   // if (rol !== 'owner') return new UnauthorizedException();
-
-  //   const data = {
-  //     type: 'ROOM_INFO',
-  //     event: 'USER_LOGOUT',
-  //     sender: idUser,
-  //     content: {
-  //       idUser
-  //     }
-  //   }
-  //   return this.rabbitMQService.sendLogout(idUser, idRoom, data);
-  // }
-
-  // @Get('info/:idRoom')
-  // // @UseGuards(IsUserGuard)
-  // async info(@Param('idRoom') idRoom: string) {
-  //   const room = await this.roomsService.info(idRoom);
-
-  //   if(room) {
-  //     return room;
-  //   } else {
-  //     throw new NotFoundException();
-  //   }
-  // }
-
-  // @Get('/all')
-  // findAll(): Promise<Rooms[]> {
-  //   return this.roomsService.findAll();
-  // }
 }

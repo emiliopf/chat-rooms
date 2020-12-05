@@ -1,4 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { CustomRabbitMQPattern } from 'src/dtos/custom-rabbitmq-pattern.dto';
 import { CustomRabbitMQ } from '../custom-rabbitmq-client';
 import { CustomRabbitMQMessage } from '../dtos/custom-rabbitmq-message.dto';
 
@@ -10,15 +11,13 @@ export class RabbitMQService {
     private rabbitmq: CustomRabbitMQ,
   ) {}
 
-  sendJoin(idRoom: number, message: CustomRabbitMQMessage) { 
-    const pattern = `ROOM-${idRoom}`
+  sendJoin(pattern: CustomRabbitMQPattern, message: CustomRabbitMQMessage) {
 
     return this.rabbitmq.emit(pattern, message);
   }
 
-  sendMessage(idRoom: number, message: CustomRabbitMQMessage) {
-    const pattern = `ROOM-${idRoom}.MESSAGES`
-
+  sendMessage(pattern: CustomRabbitMQPattern, message: CustomRabbitMQMessage) {
+    
     return this.rabbitmq.emit(pattern, message);
   }
 
