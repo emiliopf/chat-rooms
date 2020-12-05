@@ -6,6 +6,8 @@ import { IsUserGuard } from '../guards/users.guard';
 import { LoginRoomDto } from '../dtos/login-room.dto';
 import { UsersConnector } from '../utils/users-connector';
 import { RabbitMQService } from '../services/rabbitmq.service';
+import { CustomRabbitMQMessage } from '../dtos/custom-rabbitmq-message.dto';
+import database from 'src/config/database';
 
 @Controller('')
 export class RoomsController {
@@ -57,12 +59,11 @@ export class RoomsController {
     const { data: user } = await this.usersConnector.findById(idUser);
 
     console.log(user);
-    const content = {
-      type: 'ROOM_INFO',
+
+    const message: CustomRabbitMQMessage = {
+      senderId: idUser,
       event: 'USER_JOIN',
-      sender: idUser,
       content: {
-        // todo - refactor user findById
         user: {
           idUser: user.id,
           alias: user.alias,
@@ -71,59 +72,78 @@ export class RoomsController {
       }
     }
 
-    return this.rabbitMQService.sendJoin(idRoom, content);
+    return this.rabbitMQService.sendJoin(idRoom, message);
   }
 
-
-  @Post('/sendInfo')
+  @Post('/message')
   @UseGuards(IsUserGuard)
-  async sendRoomInfo(@Body() body, @Request() request) {
-    const { user: idUser, room: idRoom, rol } = request;
+  async sendMessage(@Request() request, @Body() body) {
+    const { user: idUser, room: idRoom } = request;
+    const { content } = body;
+    const { data: user } = await this.usersConnector.findById(idUser);
 
-    if (rol !== 'owner') return new UnauthorizedException();
-
-    const data = {
-      type: 'ROOM_INFO',
-      event: 'REFRESH',
-      sender: idUser,
-      content: body
+    const message: CustomRabbitMQMessage = {
+      senderId: idUser,
+      event: 'NEW_MESSAGE',
+      content
     }
-    return this.rabbitMQService.sendInfo(idUser, idRoom, data);
+
+    console.log(message);
+
+    return this.rabbitMQService.sendMessage(idRoom, message);
+    
   }
 
 
-  @Post('/logout')
-  @UseGuards(IsUserGuard)
-  async logout(@Body() body, @Request() request) {
-    const { user: idUser, room: idRoom, rol } = request;
-
-    // if (rol !== 'owner') return new UnauthorizedException();
-
-    const data = {
-      type: 'ROOM_INFO',
-      event: 'USER_LOGOUT',
-      sender: idUser,
-      content: {
-        idUser
-      }
-    }
-    return this.rabbitMQService.sendLogout(idUser, idRoom, data);
-  }
-
-  @Get('info/:idRoom')
+  // @Post('/sendInfo')
   // @UseGuards(IsUserGuard)
-  async info(@Param('idRoom') idRoom: string) {
-    const room = await this.roomsService.info(idRoom);
+  // async sendRoomInfo(@Body() body, @Request() request) {
+  //   const { user: idUser, room: idRoom, rol } = request;
 
-    if(room) {
-      return room;
-    } else {
-      throw new NotFoundException();
-    }
-  }
+  //   if (rol !== 'owner') return new UnauthorizedException();
 
-  @Get('/all')
-  findAll(): Promise<Rooms[]> {
-    return this.roomsService.findAll();
-  }
+  //   const data = {
+  //     type: 'ROOM_INFO',
+  //     event: 'REFRESH',
+  //     sender: idUser,
+  //     content: body
+  //   }
+  //   return this.rabbitMQService.sendInfo(idUser, idRoom, data);
+  // }
+
+
+  // @Post('/logout')
+  // @UseGuards(IsUserGuard)
+  // async logout(@Body() body, @Request() request) {
+  //   const { user: idUser, room: idRoom, rol } = request;
+
+  //   // if (rol !== 'owner') return new UnauthorizedException();
+
+  //   const data = {
+  //     type: 'ROOM_INFO',
+  //     event: 'USER_LOGOUT',
+  //     sender: idUser,
+  //     content: {
+  //       idUser
+  //     }
+  //   }
+  //   return this.rabbitMQService.sendLogout(idUser, idRoom, data);
+  // }
+
+  // @Get('info/:idRoom')
+  // // @UseGuards(IsUserGuard)
+  // async info(@Param('idRoom') idRoom: string) {
+  //   const room = await this.roomsService.info(idRoom);
+
+  //   if(room) {
+  //     return room;
+  //   } else {
+  //     throw new NotFoundException();
+  //   }
+  // }
+
+  // @Get('/all')
+  // findAll(): Promise<Rooms[]> {
+  //   return this.roomsService.findAll();
+  // }
 }

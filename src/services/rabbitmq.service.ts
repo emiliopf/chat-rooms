@@ -10,33 +10,34 @@ export class RabbitMQService {
     private rabbitmq: CustomRabbitMQ,
   ) {}
 
-  sendJoin(idRoom: number, data: any) { 
+  sendJoin(idRoom: number, message: CustomRabbitMQMessage) { 
+    const pattern = `ROOM-${idRoom}`
 
-    const message: CustomRabbitMQMessage = {
-      type: 'topic',
-      exchange: `ROOM-${idRoom}`,
-      routingKey: 'message.info',
-      content: data
-    }
-
-    return this.rabbitmq.emit(message.routingKey, message);
+    return this.rabbitmq.emit(pattern, message);
   }
 
-  sendInfo(idUser: number, idRoom: number, data: any) { 
-    // const topic = this.rabbitmq.generateTopic(idRoom, 'INFO');
+  sendMessage(idRoom: number, message: CustomRabbitMQMessage) {
+    const pattern = `ROOM-${idRoom}.MESSAGES`
 
-    return this.rabbitmq.emit('', data);
+    return this.rabbitmq.emit(pattern, message);
   }
 
-  sendLogout(idUser: number, idRoom: number, data: any) {
+
+  // sendInfo(idUser: number, idRoom: number, data: any) { 
+  //   // const topic = this.rabbitmq.generateTopic(idRoom, 'INFO');
+
+  //   return this.rabbitmq.emit('', data);
+  // }
+
+  // sendLogout(idUser: number, idRoom: number, data: any) {
   
-    const message: CustomRabbitMQMessage = {
-      type: 'topic',
-      exchange: `ROOM-${idRoom}`,
-      routingKey: 'message.info',
-      content: data
-    }
+  //   const message: CustomRabbitMQMessage = {
+  //     type: 'topic',
+  //     exchange: `ROOM-${idRoom}`,
+  //     routingKey: 'message.info',
+  //     content: data
+  //   }
 
-    return this.rabbitmq.emit(message.routingKey, message);
-  }
+  //   return this.rabbitmq.emit(message.routingKey, message);
+  // }
 }
