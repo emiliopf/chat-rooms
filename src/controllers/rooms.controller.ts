@@ -26,6 +26,23 @@ export class RoomsController {
     const { id: idRoom } = await this.roomsService.create(body);
     const { data: { id: idUser, alias } } = await this.usersConnector.create(body);
 
+
+    const message: CustomRabbitMQMessage = {
+      senderId: idUser,
+      event: 'ROOM_CREATED',
+      content: {
+        user: {}
+      }
+    }
+
+    const pattern: CustomRabbitMQPattern = {
+      exchange: `ROOM-${idRoom}`,
+      topic: 'MESSAGES'
+    }
+
+    this.rabbitMQService.sendMessage(pattern, message);
+
+
     const { data: { token } } = await this.usersConnector.getToken({idRoom, idUser, alias, rol});
     
     return { token };
@@ -82,8 +99,13 @@ export class RoomsController {
   @UseGuards(IsUserGuard)
   async sendMessage(@Request() request, @Body() body) {
     const { user: idUser, room: idRoom } = request;
-    const { content } = body;
+    const { input } = body;
     const { data: user } = await this.usersConnector.findById(idUser);
+
+    const content = {
+      input,
+      user
+    }
 
     const message: CustomRabbitMQMessage = {
       senderId: idUser,
