@@ -92,7 +92,7 @@ export class RoomsController {
       topic: 'MESSAGES'
     }
 
-    return this.rabbitMQService.sendJoin(pattern, message);
+    return this.rabbitMQService.sendMessage(pattern, message);
   }
 
   @Post('/message')
@@ -131,5 +131,31 @@ export class RoomsController {
     } else {
       throw new NotFoundException();
     }
+  }
+
+
+  @Post('/logout')
+  @UseGuards(IsUserGuard)
+  async logout(@Request() request) {
+    const { user: idUser, room: idRoom } = request;
+    const { data: user } = await this.usersConnector.findById(idUser);
+
+    const message: CustomRabbitMQMessage = {
+      senderId: idUser,
+      event: 'USER_LEFT',
+      content: {
+        user: {
+          idUser: user.id,
+          alias: user.alias,
+        }
+      }
+    }
+
+    const pattern: CustomRabbitMQPattern = {
+      exchange: `ROOM-${idRoom}`,
+      topic: 'MESSAGES'
+    }
+
+    return this.rabbitMQService.sendMessage(pattern, message);
   }
 }
