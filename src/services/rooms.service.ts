@@ -23,17 +23,13 @@ export class RoomsService {
     return this.roomsRepository.save(room);
   }
 
-  async info(id: string): Promise<Rooms> {
-    return this.roomsRepository.findOne(id);
+  async getRoom(id: number): Promise<Rooms> {
+    return this.roomsRepository.findOne({select: ['id'], where: { id }});
   }
 
   async checkPassword(idRoom: string, entryPassword: string): Promise<boolean> {
     const { password: encryptedPassword } = await this.roomsRepository.findOne(idRoom, {select: ['password']});
     return  await bcrypt.compare(entryPassword, encryptedPassword);
-  }
-
-  findAll(): Promise<Rooms[]> {
-    return this.roomsRepository.find();
   }
 
 }

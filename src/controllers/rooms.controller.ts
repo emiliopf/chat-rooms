@@ -121,4 +121,15 @@ export class RoomsController {
     return this.rabbitMQService.sendMessage(pattern, message);
     
   }
+
+  @Get('/:idRoom')
+  async checkExists(@Param('idRoom') idRoom: number) {
+    const room = await this.roomsService.getRoom(idRoom);
+    
+    if (room) {
+      return room;
+    } else {
+      throw new NotFoundException();
+    }
+  }
 }
