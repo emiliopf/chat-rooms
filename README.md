@@ -1,74 +1,181 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
+
+  <h3 align="center">ROOMS - <a href="https://github.com/emiliopf/chat-app">CHAT APP</a></h3>
+  <p align="center">
+    Rooms microservice.
+    <br />
+  </p>
 </p>
 
-[travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
-[travis-url]: https://travis-ci.org/nestjs/nest
-[linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
-[linux-url]: https://travis-ci.org/nestjs/nest
-  
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications, heavily inspired by <a href="https://angular.io" target="blank">Angular</a>.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/dm/@nestjs/core.svg" alt="NPM Downloads" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://api.travis-ci.org/nestjs/nest.svg?branch=master" alt="Travis" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://img.shields.io/travis/nestjs/nest/master.svg?label=linux" alt="Linux" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#5" alt="Coverage" /></a>
-<a href="https://gitter.im/nestjs/nestjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge"><img src="https://badges.gitter.im/nestjs/nestjs.svg" alt="Gitter" /></a>
-<a href="https://opencollective.com/nest#backer"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-  <a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+<!-- TABLE OF CONTENTS -->
+<details open="open">
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#set-up">Set Up</a></li>
+      </ul>
+    </li>
+    <li><a href="#endponits">Endpoints</a></li>
+    <li><a href="#built-with">Built With</a></li>
+    <li><a href="#license">License</a></li>
+  </ol>
+</details>
+<br />
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## About The Project
 
-## Installation
 
-```bash
-$ npm install
+Rooms microservice is responsible for create rooms, login into and send messages to the message broker.
+
+
+## Gettiing Started
+
+### Prerequisites
+
+* [Node](https://nodejs.org/en/) v15.11 or higher.
+* [Users](https://github.com/emiliopf/chat-users) microservice.
+* [RabbitMQ](https://www.rabbitmq.com/)
+* Mysql Server()
+
+
+### Set Up
+
+1. Add [database](/src/config/database.ts) environment variables.
+2. Add [jwt](/src/config/jwt.ts) environment variables.
+3. Add [rabbitmq](/src/config/rabbitmq.ts) environment variables.
+4. Add [app](/src/config/app.ts) encironment variables.
+3. Launch `npm run start`
+
+## Endpoints
+
+### **Create room**
+
+Make  call to users microservice to create [user](https://github.com/emiliopf/chat-users) and get the access_token. Also send message ("ROOM_CREATED") over amqp.
+
+```http
+POST /rooms/create
+
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+BODY
+```
+{
+  "alias": "emilio",
+  "password": "abcdfg"
+}
 ```
 
-## Test
+RESPONSE:
 
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+```
+{
+  "token": "JWT TOKEN",
+}
 ```
 
-## Support
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### **Login room**
 
-## Stay in touch
+Verify password and create the user calling [user](https://github.com/emiliopf/chat-users) microservice.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```http
+POST /rooms/login
+```
+
+BODY
+```
+{
+  "idRoom": 1,
+  "password": "abcdfg",,
+  "alias": "juan"
+}
+```
+
+RESPONSE:
+
+```
+{
+  "token": "JWT TOKEN"
+}
+```
+
+### **Login success**
+
+Send message ("USER_JOIN") over amqp with the JWT params.
+
+```http
+POST /rooms/loginsuccess
+```
+
+Headers
+```
+{
+  "Authorization": "Bearer JWT TOKEN",
+}
+```
+
+
+### **Send message**
+
+Send message ("NEW_MESSAGE") over amqp with the JWT params and input received from request body.
+
+```http
+POST /rooms/message
+```
+
+Headers
+```
+{
+  "Authorization": "Bearer JWT TOKEN",
+}
+```
+
+BODY
+```
+{
+  "input": "Lrem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ipsum metus, feugiat non nibh et, tincidunt facilisis lacus."
+}
+```
+
+
+### **Check room**
+
+Verify if :idRoom exists.
+
+```http
+GET /rooms/:idRoom
+
+```
+
+
+RESPONSE:
+
+```
+{
+  "id": 1,
+}
+```
+
+### **Logout**
+
+Send message ("USER_LEFT") over amqp with the JWT params.
+
+```http
+POST /rooms/logout
+```
+
+Headers
+```
+{
+  "Authorization": "Bearer JWT TOKEN",
+}
+```
+
 
 ## License
 
