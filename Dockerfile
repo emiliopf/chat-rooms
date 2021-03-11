@@ -2,7 +2,7 @@ FROM node:14.2-alpine
 
 WORKDIR /app
 EXPOSE 3000
-ENTRYPOINT []
+# ENTRYPOINT []
 CMD ["npm", "run", "start:dev"]
 
 COPY package* ./
